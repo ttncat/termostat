@@ -3,7 +3,6 @@
 Exemple de comunicació bidireccional sobre TTN amb un Arduino MKR WAN 1300.
 
 [![license](https://img.shields.io/github/license/ttncat/termostat.svg)](LICENSE)
-[![travis](https://travis-ci.org/ttncat/termostat.svg?branch=master)](https://travis-ci.org/ttncat/termostat)
 [![twitter](https://img.shields.io/twitter/follow/ttncat.svg?style=social)](https://twitter.com/intent/follow?screen_name=ttncat)
 
 Aquest exemple fa servir la llibreria MKRWAN d'Arduino,
