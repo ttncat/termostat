@@ -26,6 +26,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <MKRWAN.h>
+
+// -----------------------------------------------------------------------------
+
 #include "credentials.h"
 
 #define APP_PORT        12      // Application port
@@ -39,53 +42,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RELAY_GPIO      5       // Digital GPIO for the relay
 #define RELAY_INVERSE   1       // Relay uses inverse logic
 
+#define ADC_MAX         1023.0  // Using 10bits ADCs (0-1023)
+#define ADC_REFERENCE   3300    // 3V3 analog reference
+
+// -----------------------------------------------------------------------------
+
 LoRaModem modem;
 bool relay_status = false;      // Default status OFF
 
-void ttn_join() {
+// -----------------------------------------------------------------------------
 
-    // Register to EU region
-    if (!modem.begin(EU868)) {
-        Serial.println("[ERROR] Failed to start module");
-        while (1) {}
-    };
-    Serial.print("[INFO] Your module version is: ");
-    Serial.println(modem.version());
-    Serial.print("[INFO] Your device EUI is: ");
-    Serial.println(modem.deviceEUI());
-
-    // Join network
-    #if LORA_MODE == LORA_MODE_OTAA
-        bool connected = modem.joinOTAA(appEui, appKey);
-    #else
-        bool connected = modem.joinABP(devAddr, nwkSKey, appSKey);
-    #endif
-    if (connected) {
-        Serial.println("[INFO] Network joined!");
-    } else {
-        Serial.println("[ERROR] Something went wrong, could not join network");
-        while (1) {}
-    }
-
-    // Configure
-    modem.setPort(APP_PORT);
-    //modem.setADR(true);
-
+float getTemperature() {
+    unsigned long reading = analogRead(TMP35_GPIO);
+    float millivolts = (reading / ADC_MAX) * ADC_REFERENCE;
+    float celsius = millivolts / 10;
+    return celsius;
 }
+
+// -----------------------------------------------------------------------------
 
 void ttn_send() {
 
-    Serial.println("[INFO] Sending message");
-
     // Get temperature
-    unsigned long reading = analogRead(TMP35_GPIO);
-    float millivolts = (reading / 1023.0) * 3300;       // 10 bits ADC, 3.3V reference
-    float celsius = millivolts / 10;                    // 10mV/C
-    Serial.print("[INFO] Temperature reading: ");
-    Serial.println(celsius);
+    float celsius = getTemperature();
 
-    // Get relay status
-    Serial.print("[INFO] Relay status: ");
+    // Console info
+    Serial.print("[INFO] Sending message, payload: ");
+    Serial.print(celsius);
+    Serial.print("C, relay ");
     Serial.println(relay_status ? "ON" : "OFF");
 
     // Encoding message
@@ -120,9 +104,9 @@ void ttn_send() {
         modem.write(buffer[0]);
         modem.write(buffer[1]);
         modem.write(buffer[2]);
-        int err = modem.endPacket(REQUIRE_ACK);
+        int response = modem.endPacket(REQUIRE_ACK);
 
-        if (err > 0) {
+        if (response > 0) {
             Serial.println("[INFO] Message sent correctly!");
             return;
         }
@@ -143,7 +127,7 @@ void ttn_receive() {
 
     // Get response from radio
     while (modem.available()) {
-        bool relay = (modem.read() == '1');
+        bool relay = ('1' == modem.read());
         Serial.print("[INFO] Turning relay ");
         Serial.println(relay ? "ON" : "OFF");
         digitalWrite(RELAY_GPIO, RELAY_INVERSE ? !relay : relay);
@@ -154,12 +138,46 @@ void ttn_receive() {
 
 }
 
+void ttn_join() {
+
+    // Register to EU region
+    if (!modem.begin(EU868)) {
+        Serial.println("[ERROR] Failed to start module");
+        while (1) {}
+    };
+    Serial.print("[INFO] Your module version is: ");
+    Serial.println(modem.version());
+    Serial.print("[INFO] Your device EUI is: ");
+    Serial.println(modem.deviceEUI());
+
+    // Join network
+    #if LORA_MODE == LORA_MODE_OTAA
+        bool connected = modem.joinOTAA(appEui, appKey);
+    #else
+        bool connected = modem.joinABP(devAddr, nwkSKey, appSKey);
+    #endif
+    if (connected) {
+        Serial.println("[INFO] Network joined!");
+    } else {
+        Serial.println("[ERROR] Something went wrong, could not join network");
+        while (1) {}
+    }
+
+    // Configure
+    modem.setPort(APP_PORT);
+    //modem.setADR(true);
+
+}
+
+// -----------------------------------------------------------------------------
 
 void setup() {
 
-    // Init serial output
+    // Configure ports
     Serial.begin(115200);
-    delay(5000);
+
+    // Wait a maximum of 10s for Serial Monitor
+    while (!Serial && millis() < 10000);
     Serial.println("[INFO] @ttncat thermostat");
 
     // Setup button, relay & sensor
