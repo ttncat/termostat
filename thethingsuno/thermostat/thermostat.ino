@@ -26,7 +26,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <TheThingsNetwork.h>
-#include <TheThingsMessage.h>
+
+// -----------------------------------------------------------------------------
+
 #include "credentials.h"
 
 #define APP_PORT        12      // Application port
@@ -40,39 +42,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RELAY_GPIO      5       // Digital GPIO for the relay
 #define RELAY_INVERSE   1       // Relay uses inverse logic
 
+#define ADC_MAX         1023.0  // ATMega32u4 has 10bits ADCs (0-1023)
+#define ADC_REFERENCE   5000    // 5V analog reference
+
+// -----------------------------------------------------------------------------
+
 TheThingsNetwork ttn(Serial1, Serial, TTN_FP_EU868);
-devicedata_t data = api_DeviceData_init_default;
 bool relay_status = false;      // Default status OFF
 
-void ttn_join() {
+// -----------------------------------------------------------------------------
 
-    // Show device status
-    ttn.showStatus();
-
-    // Join network
-    #if LORA_MODE == LORA_MODE_OTAA
-        bool connected = ttn.join(appEui, appKey);
-    #else
-        bool connected = ttn.personalize(devAddr, nwkSKey, appSKey);
-    #endif
-
-    if (connected) {
-        Serial.println("[INFO] Network joined!");
-    } else {
-        Serial.println("[ERROR] Something went wrong, could not join network");
-        while (1) {}
-    }
-
-    ttn.onMessage(ttn_receive);
-
+float getTemperature() {
+    unsigned long reading = analogRead(TMP35_GPIO);
+    float millivolts = (reading / ADC_MAX) * ADC_REFERENCE;
+    float celsius = millivolts / 10;
+    return celsius;
 }
+
+// -----------------------------------------------------------------------------
 
 void ttn_send() {
 
     // Get temperature
-    unsigned long reading = analogRead(TMP35_GPIO);
-    float millivolts = (reading / 1023.0) * 3300;       // 10 bits ADC, 3.3V reference
-    float celsius = millivolts / 10;                    // 10mV/C
+    float celsius = getTemperature();
 
     // Console info
     Serial.print("[INFO] Sending message, payload: ");
@@ -110,7 +102,7 @@ void ttn_send() {
 
         ttn_response_t response = ttn.sendBytes(buffer, sizeof(buffer), APP_PORT);
 
-        if (response == TTN_SUCCESSFUL_TRANSMISSION) {
+        if (response > 0) {
             Serial.println("[INFO] Message sent correctly!");
             return;
         }
@@ -136,6 +128,31 @@ void ttn_receive(const uint8_t *payload, size_t length, port_t port) {
         relay_status = relay;
     }
 }
+
+void ttn_join() {
+
+    // Show device status
+    ttn.showStatus();
+
+    // Join network
+    #if LORA_MODE == LORA_MODE_OTAA
+        bool connected = ttn.join(appEui, appKey);
+    #else
+        bool connected = ttn.personalize(devAddr, nwkSKey, appSKey);
+    #endif
+
+    if (connected) {
+        Serial.println("[INFO] Network joined!");
+    } else {
+        Serial.println("[ERROR] Something went wrong, could not join network");
+        while (1) {}
+    }
+
+    ttn.onMessage(ttn_receive);
+
+}
+
+// -----------------------------------------------------------------------------
 
 void setup() {
 
