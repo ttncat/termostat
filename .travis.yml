@@ -8,5 +8,5 @@ cache:
 install:
 - pip install -U platformio
 script:
-- cd mkrwan1300 && pio run && cd ..
-- cd thethingsuno && pio run && cd ..
+- cd mkrwan1300 && cp thermostat/credentials.sample.h thermostat/credentials.h && pio run && cd ..
+- cd thethingsuno && cp thermostat/credentials.sample.h thermostat/credentials.h && pio run && cd ..
