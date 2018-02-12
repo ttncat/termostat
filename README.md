@@ -5,6 +5,7 @@
 Exemple de comunicació bidireccional sobre TTN.
 
 [![license](https://img.shields.io/github/license/ttncat/termostat.svg)](LICENSE)
+[![travis](https://travis-ci.org/ttncat/termostat.svg?branch=master)](https://travis-ci.org/ttncat/termostat)
 [![twitter](https://img.shields.io/twitter/follow/ttncat.svg?style=social)](https://twitter.com/intent/follow?screen_name=ttncat)
 
 Aquest repositori conté exemples de connexió bidireccional a TTN
