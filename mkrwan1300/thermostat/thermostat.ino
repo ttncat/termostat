@@ -167,10 +167,11 @@ void ttn_join() {
 
     // Configure
     modem.setPort(APP_PORT);
-    modem.setADR(true);
-    modem.setDuty(false);
 
     /*
+
+    modem.setADR(true);
+    modem.setDuty(false);
 
     bool setADR(bool adr) {
         sendAT(GF("+ADR="), adr);
