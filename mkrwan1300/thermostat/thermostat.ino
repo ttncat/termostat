@@ -42,10 +42,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RELAY_GPIO      5       // Digital GPIO for the relay
 #define RELAY_INVERSE   1       // Relay uses inverse logic
 
-#define ADC_MAX         1023.0  // Using 10bits ADCs (0-1023)
+#define ADC_RESOLUTION  12      // Using 12bits ADC
 #define ADC_REFERENCE   3300    // 3V3 analog reference
 
 // -----------------------------------------------------------------------------
+
+#define ADC_MAX         ( ( 1 << ADC_RESOLUTION ) - 1 )
 
 LoRaModem modem;
 bool relay_status = false;      // Default status OFF
@@ -53,7 +55,7 @@ bool relay_status = false;      // Default status OFF
 // -----------------------------------------------------------------------------
 
 float getTemperature() {
-    unsigned long reading = analogRead(TMP35_GPIO);
+    float reading = analogRead(TMP35_GPIO);
     float millivolts = (reading / ADC_MAX) * ADC_REFERENCE;
     float celsius = millivolts / 10;
     return celsius;
@@ -165,7 +167,22 @@ void ttn_join() {
 
     // Configure
     modem.setPort(APP_PORT);
-    //modem.setADR(true);
+    modem.setADR(true);
+    modem.setDuty(false);
+
+    /*
+
+    bool setADR(bool adr) {
+        sendAT(GF("+ADR="), adr);
+        return (waitResponse() == 1);
+    }
+
+    bool setDuty(bool duty) {
+        sendAT(GF("+DCS="), duty);
+        return (waitResponse() == 1);
+    }
+
+    */
 
 }
 
@@ -185,6 +202,7 @@ void setup() {
     pinMode(RELAY_GPIO, OUTPUT);
     pinMode(TMP35_GPIO, INPUT);
     digitalWrite(RELAY_GPIO, RELAY_INVERSE ? !relay_status : relay_status);
+    analogReadResolution(ADC_RESOLUTION);
 
     // Join TTN network
     ttn_join();
