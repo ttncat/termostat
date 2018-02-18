@@ -1,0 +1,1162 @@
+[
+    {
+        "id": "ef2c1221.5bed98",
+        "type": "function",
+        "z": "6e1fba08.638ccc",
+        "name": "lógica",
+        "func": "// Get the target value\nvar target = parseInt(global.get('mode'));\n\n// Process only if auto mode\nif (target == 2) {\n    target = msg.payload.relay;\n    var min = global.get('min_temperature') || 18;\n    var max = global.get('max_temperature') || 21;\n    if (msg.payload.temperature > max) target = false;\n    if (msg.payload.temperature < min) target = true;\n}\n\n// To bool\ntarget = (1 == target);\n\n// If no change return null object\nif (target == msg.payload.relay) return null;\n\n// Otherwise return target\nmsg.payload = target;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 290,
+        "y": 260,
+        "wires": [
+            [
+                "5f04f90e.5ab468"
+            ]
+        ]
+    },
+    {
+        "id": "5f97b7f.5917b48",
+        "type": "debug",
+        "z": "6e1fba08.638ccc",
+        "name": "event",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "complete": "true",
+        "x": 290,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "a59b70d9.1fe078",
+        "type": "debug",
+        "z": "6e1fba08.638ccc",
+        "name": "uplink",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "complete": "true",
+        "x": 290,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "530df775.2b08c8",
+        "type": "debug",
+        "z": "6e1fba08.638ccc",
+        "name": "downlink",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 1180,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "792f31ef.183ea",
+        "type": "ttn device",
+        "z": "6e1fba08.638ccc",
+        "name": "ttn event",
+        "app": "5da85721.a58d4",
+        "dev_id": "mkrwan1300",
+        "event": "activations",
+        "x": 120,
+        "y": 140,
+        "wires": [
+            [
+                "5f97b7f.5917b48"
+            ]
+        ]
+    },
+    {
+        "id": "58ef24b0.87eacc",
+        "type": "ttn send",
+        "z": "6e1fba08.638ccc",
+        "name": "ttn downlink",
+        "app": "5da85721.a58d4",
+        "dev_id": "mkrwan_00",
+        "port": "12",
+        "x": 1190,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "d7ea3b47.770aa",
+        "type": "ttn message",
+        "z": "6e1fba08.638ccc",
+        "name": "ttn.uplink",
+        "app": "5da85721.a58d4",
+        "dev_id": "mkrwan_00",
+        "field": "",
+        "x": 120,
+        "y": 200,
+        "wires": [
+            [
+                "a59b70d9.1fe078",
+                "54f7364b.5848f8"
+            ]
+        ]
+    },
+    {
+        "id": "9b062d26.d38988",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 01",
+        "group": "a12f2336.7c1eb",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 720,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "a517342c.ccc408",
+        "type": "function",
+        "z": "6e1fba08.638ccc",
+        "name": "build_downlink",
+        "func": "return {\n    dev_id: msg.dev_id,\n    port: msg.port,\n    schedule: \"replace\",\n    confirmed: false,\n    payload: Buffer.from([msg.payload ? 0x31 : 0x30])\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 980,
+        "y": 160,
+        "wires": [
+            [
+                "530df775.2b08c8",
+                "58ef24b0.87eacc"
+            ]
+        ]
+    },
+    {
+        "id": "d1d3cf04.d07358",
+        "type": "link in",
+        "z": "6e1fba08.638ccc",
+        "name": "schedule",
+        "links": [
+            "5f04f90e.5ab468",
+            "c73f9e4.83d056",
+            "4834d898.de91f8",
+            "19cfd96a.568197"
+        ],
+        "x": 815,
+        "y": 160,
+        "wires": [
+            [
+                "a517342c.ccc408"
+            ]
+        ]
+    },
+    {
+        "id": "5f04f90e.5ab468",
+        "type": "link out",
+        "z": "6e1fba08.638ccc",
+        "name": "",
+        "links": [
+            "d1d3cf04.d07358"
+        ],
+        "x": 455,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "4f9bddcc.4dd46c",
+        "type": "function",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura",
+        "func": "msg.payload = msg.payload.temperature;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 310,
+        "y": 680,
+        "wires": [
+            [
+                "522014b2.1a7bb4"
+            ]
+        ]
+    },
+    {
+        "id": "b1e8480b.679b38",
+        "type": "comment",
+        "z": "6e1fba08.638ccc",
+        "name": "Processat de missatges (uplink)",
+        "info": "",
+        "x": 190,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "89226cf8.950128",
+        "type": "comment",
+        "z": "6e1fba08.638ccc",
+        "name": "Enviament (downlink)",
+        "info": "",
+        "x": 900,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "33b92e12.cb9f52",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 02",
+        "group": "11e7f7b3.0ca838",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 920,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "522014b2.1a7bb4",
+        "type": "switch",
+        "z": "6e1fba08.638ccc",
+        "name": "encaminador",
+        "property": "dev_id",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "mkrwan_00",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_01",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_02",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_03",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_04",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_05",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_06",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_07",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_08",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_09",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_10",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 11,
+        "x": 510,
+        "y": 680,
+        "wires": [
+            [
+                "35a8d8fd.e986d8"
+            ],
+            [
+                "9b062d26.d38988"
+            ],
+            [
+                "33b92e12.cb9f52"
+            ],
+            [
+                "102a83b4.93c654"
+            ],
+            [
+                "8e7750b8.1a131"
+            ],
+            [
+                "e289ee40.39d908"
+            ],
+            [
+                "af964f95.6abe28"
+            ],
+            [
+                "edd5f787.0a8638"
+            ],
+            [
+                "f95b4ae4.ec3c3"
+            ],
+            [
+                "48b20ae5.c6852c"
+            ],
+            [
+                "3c5e0c4b.810e9c"
+            ]
+        ]
+    },
+    {
+        "id": "74389272.19f8bc",
+        "type": "function",
+        "z": "6e1fba08.638ccc",
+        "name": "relé",
+        "func": "msg.payload = msg.payload.relay;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 290,
+        "y": 400,
+        "wires": [
+            [
+                "bc4be92e.08013"
+            ]
+        ]
+    },
+    {
+        "id": "bc4be92e.08013",
+        "type": "switch",
+        "z": "6e1fba08.638ccc",
+        "name": "encaminador",
+        "property": "dev_id",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "mkrwan_00",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_01",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_02",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_03",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_04",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_05",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_06",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_07",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_08",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_09",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "mkrwan_10",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 11,
+        "x": 510,
+        "y": 400,
+        "wires": [
+            [
+                "4dbc04d4.b0dbbc"
+            ],
+            [
+                "fa0727d.917fad8"
+            ],
+            [
+                "f8faab61.4f8518"
+            ],
+            [
+                "16a4f31e.0168a5"
+            ],
+            [
+                "a6c41cb1.00662"
+            ],
+            [
+                "407816de.c7cdd"
+            ],
+            [
+                "bae626aa.af63e8"
+            ],
+            [
+                "8a1a921c.3c736"
+            ],
+            [
+                "946c8129.906918"
+            ],
+            [
+                "7d6aed48.864464"
+            ],
+            [
+                "56f6a0db.221d"
+            ]
+        ]
+    },
+    {
+        "id": "fa0727d.917fad8",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 01",
+        "label": "Estat relé",
+        "group": "a12f2336.7c1eb",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 700,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f8faab61.4f8518",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 02",
+        "label": "Estat relé",
+        "group": "11e7f7b3.0ca838",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 900,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "16a4f31e.0168a5",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 03",
+        "label": "Estat relé",
+        "group": "4472af91.489eb",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 700,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a6c41cb1.00662",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 04",
+        "label": "Estat relé",
+        "group": "84a3f3f4.e99c4",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 900,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "407816de.c7cdd",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 05",
+        "label": "Estat relé",
+        "group": "22210ce5.c0dbb4",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 700,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bae626aa.af63e8",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 06",
+        "label": "Estat relé",
+        "group": "9a1cff5f.d8709",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 900,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8a1a921c.3c736",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 07",
+        "label": "Estat relé",
+        "group": "f99aed7c.551ce",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 700,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "946c8129.906918",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 08",
+        "label": "Estat relé",
+        "group": "adfce605.628198",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 900,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7d6aed48.864464",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 09",
+        "label": "Estat relé",
+        "group": "bd96df70.e7025",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 700,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "56f6a0db.221d",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 10",
+        "label": "Estat relé",
+        "group": "45832cbc.fd97a4",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 900,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "102a83b4.93c654",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 03",
+        "group": "4472af91.489eb",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 720,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "8e7750b8.1a131",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 04",
+        "group": "84a3f3f4.e99c4",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 920,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "e289ee40.39d908",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 05",
+        "group": "22210ce5.c0dbb4",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 720,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "af964f95.6abe28",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 06",
+        "group": "9a1cff5f.d8709",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 920,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "edd5f787.0a8638",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 07",
+        "group": "f99aed7c.551ce",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 720,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "f95b4ae4.ec3c3",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 08",
+        "group": "adfce605.628198",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 920,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "48b20ae5.c6852c",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 09",
+        "group": "bd96df70.e7025",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 720,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "3c5e0c4b.810e9c",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 10",
+        "group": "45832cbc.fd97a4",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 920,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "4dbc04d4.b0dbbc",
+        "type": "ui_switch",
+        "z": "6e1fba08.638ccc",
+        "name": "relé 00",
+        "label": "Estat relé",
+        "group": "2577b4dc.6ab53c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 700,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "35a8d8fd.e986d8",
+        "type": "ui_gauge",
+        "z": "6e1fba08.638ccc",
+        "name": "temperatura 00",
+        "group": "2577b4dc.6ab53c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "18",
+        "seg2": "21",
+        "x": 720,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "54f7364b.5848f8",
+        "type": "function",
+        "z": "6e1fba08.638ccc",
+        "name": "validar",
+        "func": "if (\"relay\" in msg.payload) return msg;\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 130,
+        "y": 400,
+        "wires": [
+            [
+                "ef2c1221.5bed98",
+                "74389272.19f8bc",
+                "4f9bddcc.4dd46c"
+            ]
+        ]
+    },
+    {
+        "id": "5da85721.a58d4",
+        "type": "ttn app",
+        "z": "",
+        "appId": "ttncat-taller",
+        "region": "eu",
+        "accessKey": "CHANGEME"
+    },
+    {
+        "id": "a12f2336.7c1eb",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 01",
+        "tab": "b4a68225.a7d128",
+        "order": 2,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "11e7f7b3.0ca838",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 02",
+        "tab": "b4a68225.a7d128",
+        "order": 3,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "4472af91.489eb",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 03",
+        "tab": "b4a68225.a7d128",
+        "order": 4,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "84a3f3f4.e99c4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 04",
+        "tab": "b4a68225.a7d128",
+        "order": 5,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "22210ce5.c0dbb4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 05",
+        "tab": "b4a68225.a7d128",
+        "order": 6,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "9a1cff5f.d8709",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 06",
+        "tab": "b4a68225.a7d128",
+        "order": 7,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "f99aed7c.551ce",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 07",
+        "tab": "b4a68225.a7d128",
+        "order": 8,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "adfce605.628198",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 08",
+        "tab": "b4a68225.a7d128",
+        "order": 9,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "bd96df70.e7025",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 09",
+        "tab": "b4a68225.a7d128",
+        "order": 10,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "45832cbc.fd97a4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 10",
+        "tab": "b4a68225.a7d128",
+        "order": 11,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "2577b4dc.6ab53c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Termostat 00",
+        "tab": "b4a68225.a7d128",
+        "order": 1,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "b4a68225.a7d128",
+        "type": "ui_tab",
+        "z": "",
+        "name": "TTN - Estat",
+        "icon": "dashboard",
+        "order": 2
+    }
+]

@@ -1,0 +1,286 @@
+[
+    {
+        "id": "8fa545ae.fcf328",
+        "type": "inject",
+        "z": "4dc06be5.e81754",
+        "name": "initial",
+        "topic": "",
+        "payload": "2",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "547d83f3.6ea124"
+            ]
+        ]
+    },
+    {
+        "id": "b3b24d29.dccd",
+        "type": "change",
+        "z": "4dc06be5.e81754",
+        "name": "set_min_temperature",
+        "rules": [
+            {
+                "t": "set",
+                "p": "min_temperature",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fa468741.f04d4",
+        "type": "change",
+        "z": "4dc06be5.e81754",
+        "name": "set_max_temperature",
+        "rules": [
+            {
+                "t": "set",
+                "p": "max_temperature",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ad6e3764.852d48",
+        "type": "ui_text_input",
+        "z": "4dc06be5.e81754",
+        "name": "min_temperature",
+        "label": "Turn heater on when below",
+        "group": "28ce7550.20637a",
+        "order": 1,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "mode": "text",
+        "delay": 300,
+        "topic": "",
+        "x": 330,
+        "y": 200,
+        "wires": [
+            [
+                "b3b24d29.dccd"
+            ]
+        ]
+    },
+    {
+        "id": "106d576f.f47e81",
+        "type": "ui_text_input",
+        "z": "4dc06be5.e81754",
+        "name": "max_temperature",
+        "label": "Turn heater off when above",
+        "group": "28ce7550.20637a",
+        "order": 2,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "mode": "text",
+        "delay": 300,
+        "topic": "",
+        "x": 330,
+        "y": 260,
+        "wires": [
+            [
+                "fa468741.f04d4"
+            ]
+        ]
+    },
+    {
+        "id": "13446fb8.8ea438",
+        "type": "inject",
+        "z": "4dc06be5.e81754",
+        "name": "initial",
+        "topic": "",
+        "payload": "18",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 200,
+        "wires": [
+            [
+                "ad6e3764.852d48"
+            ]
+        ]
+    },
+    {
+        "id": "cd1f9623.6dba7",
+        "type": "inject",
+        "z": "4dc06be5.e81754",
+        "name": "initial",
+        "topic": "",
+        "payload": "21",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 260,
+        "wires": [
+            [
+                "106d576f.f47e81"
+            ]
+        ]
+    },
+    {
+        "id": "547d83f3.6ea124",
+        "type": "ui_dropdown",
+        "z": "4dc06be5.e81754",
+        "name": "heater_mode",
+        "label": "Heater mode",
+        "place": "Select option",
+        "group": "28ce7550.20637a",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "OFF",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "ON",
+                "value": "1",
+                "type": "str"
+            },
+            {
+                "label": "AUTO",
+                "value": "2",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 320,
+        "y": 140,
+        "wires": [
+            [
+                "561fa065.d980b"
+            ]
+        ]
+    },
+    {
+        "id": "561fa065.d980b",
+        "type": "change",
+        "z": "4dc06be5.e81754",
+        "name": "set_mode",
+        "rules": [
+            {
+                "t": "set",
+                "p": "mode",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "19cfd96a.568197",
+        "type": "link out",
+        "z": "4dc06be5.e81754",
+        "name": "",
+        "links": [
+            "d1d3cf04.d07358"
+        ],
+        "x": 935,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "127c8327.690355",
+        "type": "switch",
+        "z": "4dc06be5.e81754",
+        "name": "if_manual",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 800,
+        "y": 140,
+        "wires": [
+            [
+                "19cfd96a.568197"
+            ]
+        ]
+    },
+    {
+        "id": "2b9abf1f.1fe07",
+        "type": "comment",
+        "z": "4dc06be5.e81754",
+        "name": "Control",
+        "info": "",
+        "x": 110,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "28ce7550.20637a",
+        "type": "ui_group",
+        "z": "",
+        "name": "Control",
+        "tab": "2450900c.2b6fa8",
+        "order": 1,
+        "disp": true,
+        "width": "8",
+        "collapse": false
+    },
+    {
+        "id": "2450900c.2b6fa8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "TTN - Control",
+        "icon": "dashboard",
+        "order": 1
+    }
+]
