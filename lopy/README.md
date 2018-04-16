@@ -28,3 +28,7 @@ Exemple de comunicació bidireccional sobre TTN amb un PyCom LoPy.
 ## Firmware
 
 Recommended upload tool is PyMakr plugin for atom (https://docs.pycom.io/chapter/pymakr/installation/atom.html)
+
+Other resources:
+* https://docs.pycom.io/
+* https://micropython.org/resources/docs/en/latest/wipy/index.html
