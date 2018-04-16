@@ -1,4 +1,5 @@
 .pioenvs
 .piolibdeps
 credentials.h
+config.py
 *.gch
