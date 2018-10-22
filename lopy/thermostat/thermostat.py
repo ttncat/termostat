@@ -29,7 +29,7 @@ print("[INFO] DevEUI: %s" % (ubinascii.hexlify(lora.mac()).decode('ascii')))
 # ------------------------------------------------------------------------------
 
 # join a network using OTAA (Over the Air Activation)
-if (config.ACTIVATION == LoRa.OTAA):
+if config.ACTIVATION == LoRa.OTAA:
     app_eui = ubinascii.unhexlify(config.APP_EUI.replace(' ',''))
     app_key = ubinascii.unhexlify(config.APP_KEY.replace(' ',''))
     auth = (app_eui, app_key)
