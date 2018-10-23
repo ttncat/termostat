@@ -1,8 +1,11 @@
 # Utility to change the LoRa MAC of the device
 # Do not use it with original PyCom boards!
 
+import sys
 import machine
 import ubinascii
+
+sys.exit()
 
 try:
     import config

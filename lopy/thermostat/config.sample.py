@@ -4,8 +4,8 @@
 
 from network import LoRa
 
-ACTIVATION = LoRa.ABP
-#ACTIVATION = LoRa.OTAA
+ACTIVATION = LoRa.OTAA
+#ACTIVATION = LoRa.ABP
 
 # OTAA
 APP_EUI = ''

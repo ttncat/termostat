@@ -16,11 +16,11 @@ pycom.heartbeat(True)
 
 # Initialize GPIO
 adc = machine.ADC()
-temperature_pin = adc.channel(pin='G3')
-relay_pin = machine.Pin('G10', mode=machine.Pin.OUT)
+temperature_pin = adc.channel(pin='G31')
+relay_pin = machine.Pin('G15', mode=machine.Pin.OUT)
 
 # Initialize LoRa in LORAWAN mode.
-lora = LoRa(mode=LoRa.LORAWAN, adr=True, region=LoRa.EU868)
+lora = LoRa(mode=LoRa.LORAWAN, adr=True)
 
 # Welcome message
 print("[INFO] @ttncat thermostat example for the LoPy");
@@ -67,9 +67,7 @@ lora_socket.bind(12)
 # ------------------------------------------------------------------------------
 
 def getTemperature():
-    t = 1100.0 * temperature_pin() / 4096 / 10 - 50
-    t = 0 if t<0 else 40 if t>40 else t
-    return t
+    return 1100.0 * temperature_pin() / 4096 / 10
 
 def getRelayStatus():
     return relay_pin()
